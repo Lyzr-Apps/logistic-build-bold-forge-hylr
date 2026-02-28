@@ -4,8 +4,9 @@ import React from 'react'
 import { MdDashboard } from 'react-icons/md'
 import { HiOutlineBell, HiOutlineCog } from 'react-icons/hi'
 import { BiHistory } from 'react-icons/bi'
+import { FiPackage } from 'react-icons/fi'
 
-type Section = 'dashboard' | 'review' | 'history' | 'settings'
+type Section = 'dashboard' | 'products' | 'review' | 'history' | 'settings'
 
 interface SidebarNavProps {
   activeSection: Section
@@ -14,10 +15,12 @@ interface SidebarNavProps {
   onToggleCollapse: () => void
   totalCritical: number
   totalWarning: number
+  productCount?: number
 }
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ReactNode }[] = [
   { id: 'dashboard', label: 'DASHBOARD', icon: <MdDashboard className="w-5 h-5" /> },
+  { id: 'products', label: 'PRODUCTS', icon: <FiPackage className="w-5 h-5" /> },
   { id: 'review', label: 'ALERT REVIEW', icon: <HiOutlineBell className="w-5 h-5" /> },
   { id: 'history', label: 'ALERT HISTORY', icon: <BiHistory className="w-5 h-5" /> },
   { id: 'settings', label: 'SETTINGS', icon: <HiOutlineCog className="w-5 h-5" /> },
@@ -30,6 +33,7 @@ export default function SidebarNav({
   onToggleCollapse,
   totalCritical,
   totalWarning,
+  productCount = 0,
 }: SidebarNavProps) {
   return (
     <aside
@@ -101,6 +105,14 @@ export default function SidebarNav({
                   style={{ background: 'hsl(40 80% 50%)', color: 'hsl(30 5% 15%)' }}
                 >
                   {totalWarning + totalCritical}
+                </span>
+              )}
+              {!collapsed && item.id === 'products' && productCount > 0 && (
+                <span
+                  className="ml-auto text-xs font-normal px-2 py-0.5"
+                  style={{ background: 'hsl(40 30% 45% / 0.15)', color: 'hsl(40 30% 45%)' }}
+                >
+                  {productCount}
                 </span>
               )}
             </button>

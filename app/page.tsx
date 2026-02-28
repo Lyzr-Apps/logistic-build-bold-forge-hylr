@@ -7,6 +7,8 @@ import DashboardSection from './sections/DashboardSection'
 import AlertReviewSection from './sections/AlertReviewSection'
 import AlertHistorySection from './sections/AlertHistorySection'
 import SettingsSection from './sections/SettingsSection'
+import ProductManagementSection from './sections/ProductManagementSection'
+import type { Product } from './sections/ProductManagementSection'
 
 // --- Types ---
 
@@ -47,7 +49,7 @@ interface HistoryEntry {
   alerts: Alert[]
 }
 
-type Section = 'dashboard' | 'review' | 'history' | 'settings'
+type Section = 'dashboard' | 'products' | 'review' | 'history' | 'settings'
 
 // --- Constants ---
 
@@ -140,6 +142,22 @@ function saveHistory(history: HistoryEntry[]) {
   } catch {}
 }
 
+function loadProducts(): Product[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const stored = localStorage.getItem('perfume-logistics-products')
+    if (stored) return JSON.parse(stored)
+  } catch {}
+  return []
+}
+
+function saveProducts(products: Product[]) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem('perfume-logistics-products', JSON.stringify(products))
+  } catch {}
+}
+
 function generateId(): string {
   return 'run-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)
 }
@@ -169,10 +187,17 @@ export default function Page() {
 
   const [settings, setSettings] = useState<ThresholdSettings>(DEFAULT_SETTINGS)
   const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
     setSettings(loadSettings())
     setHistory(loadHistory())
+    setProducts(loadProducts())
+  }, [])
+
+  const handleUpdateProducts = useCallback((updatedProducts: Product[]) => {
+    setProducts(updatedProducts)
+    saveProducts(updatedProducts)
   }, [])
 
   const handleToggleSample = useCallback((val: boolean) => {
@@ -201,6 +226,13 @@ export default function Page() {
     setLoadingStep('Initializing logistics analysis...')
 
     const s = settings
+    const activeProducts = products.filter(p => p.status === 'Active' || p.status === 'Out of Stock')
+    const productCatalog = activeProducts.length > 0
+      ? `\n\nProduct Catalog (${activeProducts.length} products):\n${activeProducts.map(p =>
+          `- ${p.name} (SKU: ${p.sku}, ${p.category} ${p.size}, Brand: ${p.brand}) | Current Stock: ${p.currentStock} units | Min Stock: ${p.minStock} | Reorder Point: ${p.reorderPoint} | Price: $${p.price.toFixed(2)} | Supplier: ${p.supplier} | Status: ${p.status}`
+        ).join('\n')}`
+      : ''
+
     const message = `Run a comprehensive logistics check for our perfume supply chain operations.
 
 Alert Thresholds:
@@ -208,8 +240,9 @@ Alert Thresholds:
 - Reorder point: ${s.reorderPoint} units
 - Maximum acceptable shipping delay: ${s.maxDelayHours} hours
 - Order age warning threshold: ${s.orderAgeWarningDays} days
+${productCatalog}
 
-Please analyze inventory levels, active shipments, and order pipeline. Flag any items that breach these thresholds with appropriate severity levels (Critical/Warning/Info).`
+Please analyze inventory levels against the product catalog above, check active shipments, and review order pipeline. Flag any items that breach these thresholds with appropriate severity levels (Critical/Warning/Info). Use the actual product names and SKUs from the catalog in your alerts.`
 
     const steps = [
       'Analyzing inventory levels...',
@@ -264,7 +297,7 @@ Please analyze inventory levels, active shipments, and order pipeline. Flag any 
       setLoading(false)
       setLoadingStep('')
     }
-  }, [settings])
+  }, [settings, products])
 
   const handleDispatch = useCallback(async (selectedAlerts: Alert[], slackChannel: string, emailRecipients: string[]) => {
     setDispatching(true)
@@ -325,6 +358,7 @@ ${selectedAlerts.map(a => `- [${a.severity}] ${a.title}: ${a.description}. Recom
           onToggleCollapse={() => setSidebarCollapsed(prev => !prev)}
           totalCritical={totalCritical}
           totalWarning={totalWarning}
+          productCount={products.length}
         />
 
         {activeSection === 'dashboard' && (
@@ -341,6 +375,15 @@ ${selectedAlerts.map(a => `- [${a.severity}] ${a.title}: ${a.description}. Recom
             sampleMode={sampleMode}
             onToggleSample={handleToggleSample}
             onRunCheck={handleRunCheck}
+            products={products}
+            onNavigateToProducts={() => setActiveSection('products')}
+          />
+        )}
+
+        {activeSection === 'products' && (
+          <ProductManagementSection
+            products={products}
+            onUpdateProducts={handleUpdateProducts}
           />
         )}
 

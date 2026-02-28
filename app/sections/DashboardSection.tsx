@@ -23,6 +23,22 @@ interface Alert {
   timestamp: string
 }
 
+interface Product {
+  id: string
+  sku: string
+  name: string
+  brand: string
+  category: string
+  size: string
+  currentStock: number
+  minStock: number
+  reorderPoint: number
+  price: number
+  supplier: string
+  status: 'Active' | 'Discontinued' | 'Out of Stock'
+  lastUpdated: string
+}
+
 interface DashboardSectionProps {
   alerts: Alert[]
   totalCritical: number
@@ -36,6 +52,8 @@ interface DashboardSectionProps {
   sampleMode: boolean
   onToggleSample: (val: boolean) => void
   onRunCheck: () => void
+  products?: Product[]
+  onNavigateToProducts?: () => void
 }
 
 function severityColor(severity: string): string {
@@ -79,6 +97,8 @@ export default function DashboardSection({
   sampleMode,
   onToggleSample,
   onRunCheck,
+  products = [],
+  onNavigateToProducts,
 }: DashboardSectionProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null)
@@ -99,8 +119,13 @@ export default function DashboardSection({
   const shippingCount = alerts.filter(a => (a.category ?? '').toLowerCase().includes('ship')).length
   const orderCount = alerts.filter(a => (a.category ?? '').toLowerCase().includes('order')).length
 
+  const activeProducts = products.filter(p => p.status === 'Active')
+  const lowStockProducts = activeProducts.filter(p => p.currentStock < p.minStock && p.currentStock > 0)
+  const outOfStockProducts = products.filter(p => p.currentStock <= 0 || p.status === 'Out of Stock')
+  const totalInventoryValue = activeProducts.reduce((sum, p) => sum + (p.price * p.currentStock), 0)
+
   const metrics = [
-    { label: 'SKUs AT RISK', value: inventoryCount, color: 'hsl(0 50% 45%)', icon: <FiPackage className="w-5 h-5" /> },
+    { label: 'SKUs AT RISK', value: inventoryCount > 0 ? inventoryCount : lowStockProducts.length, color: 'hsl(0 50% 45%)', icon: <FiPackage className="w-5 h-5" /> },
     { label: 'SHIPMENT DELAYS', value: shippingCount, color: 'hsl(40 80% 50%)', icon: <FiTruck className="w-5 h-5" /> },
     { label: 'FLAGGED ORDERS', value: orderCount, color: 'hsl(210 60% 50%)', icon: <FiShoppingCart className="w-5 h-5" /> },
     { label: 'LAST CHECK', value: checkTimestamp || '--', color: 'hsl(30 5% 50%)', icon: <HiOutlineClock className="w-5 h-5" />, isText: true },
@@ -140,6 +165,85 @@ export default function DashboardSection({
           </Card>
         ))}
       </div>
+
+      {/* Product Inventory Overview */}
+      {products.length > 0 && (
+        <Card className="rounded-none border shadow-sm" style={{ borderColor: 'hsl(30 10% 88%)', background: 'hsl(0 0% 100%)' }}>
+          <CardHeader className="p-5 pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-serif text-sm tracking-widest font-light" style={{ color: 'hsl(30 5% 50%)' }}>PRODUCT INVENTORY OVERVIEW</CardTitle>
+              {onNavigateToProducts && (
+                <button
+                  onClick={onNavigateToProducts}
+                  className="text-xs font-serif tracking-wider font-light underline transition-opacity hover:opacity-70"
+                  style={{ color: 'hsl(40 30% 45%)' }}
+                >
+                  MANAGE PRODUCTS
+                </button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="p-5 pt-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div className="p-3 border" style={{ borderColor: 'hsl(30 10% 90%)', background: 'hsl(30 8% 97%)' }}>
+                <p className="text-xs font-serif tracking-widest font-light mb-1" style={{ color: 'hsl(30 5% 50%)' }}>TOTAL SKUs</p>
+                <p className="font-serif text-xl font-light" style={{ color: 'hsl(40 30% 45%)' }}>{products.length}</p>
+              </div>
+              <div className="p-3 border" style={{ borderColor: 'hsl(30 10% 90%)', background: 'hsl(30 8% 97%)' }}>
+                <p className="text-xs font-serif tracking-widest font-light mb-1" style={{ color: 'hsl(30 5% 50%)' }}>ACTIVE</p>
+                <p className="font-serif text-xl font-light" style={{ color: 'hsl(130 40% 40%)' }}>{activeProducts.length}</p>
+              </div>
+              <div className="p-3 border" style={{ borderColor: 'hsl(30 10% 90%)', background: 'hsl(30 8% 97%)' }}>
+                <p className="text-xs font-serif tracking-widest font-light mb-1" style={{ color: 'hsl(30 5% 50%)' }}>LOW STOCK</p>
+                <p className="font-serif text-xl font-light" style={{ color: lowStockProducts.length > 0 ? 'hsl(40 80% 50%)' : 'hsl(130 40% 40%)' }}>{lowStockProducts.length}</p>
+              </div>
+              <div className="p-3 border" style={{ borderColor: 'hsl(30 10% 90%)', background: 'hsl(30 8% 97%)' }}>
+                <p className="text-xs font-serif tracking-widest font-light mb-1" style={{ color: 'hsl(30 5% 50%)' }}>INVENTORY VALUE</p>
+                <p className="font-serif text-lg font-light" style={{ color: 'hsl(30 5% 15%)' }}>${totalInventoryValue.toLocaleString()}</p>
+              </div>
+            </div>
+
+            {/* Low stock quick view */}
+            {(lowStockProducts.length > 0 || outOfStockProducts.length > 0) && (
+              <div className="space-y-1.5">
+                <p className="text-xs font-serif tracking-widest font-light mb-2" style={{ color: 'hsl(30 5% 50%)' }}>ITEMS REQUIRING ATTENTION</p>
+                {outOfStockProducts.slice(0, 3).map(p => (
+                  <div key={p.id} className="flex items-center gap-3 px-3 py-2 border" style={{ borderColor: 'hsl(0 50% 45% / 0.2)', background: 'hsl(0 50% 45% / 0.03)' }}>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: 'hsl(0 50% 45%)' }} />
+                    <span className="text-xs font-mono font-light" style={{ color: 'hsl(30 5% 50%)' }}>{p.sku}</span>
+                    <span className="text-sm font-serif font-light truncate" style={{ color: 'hsl(30 5% 15%)' }}>{p.name}</span>
+                    <span className="ml-auto text-xs font-serif font-light flex-shrink-0" style={{ color: 'hsl(0 50% 45%)' }}>OUT OF STOCK</span>
+                  </div>
+                ))}
+                {lowStockProducts.slice(0, 3).map(p => (
+                  <div key={p.id} className="flex items-center gap-3 px-3 py-2 border" style={{ borderColor: 'hsl(40 80% 50% / 0.2)', background: 'hsl(40 80% 50% / 0.03)' }}>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: 'hsl(40 80% 50%)' }} />
+                    <span className="text-xs font-mono font-light" style={{ color: 'hsl(30 5% 50%)' }}>{p.sku}</span>
+                    <span className="text-sm font-serif font-light truncate" style={{ color: 'hsl(30 5% 15%)' }}>{p.name}</span>
+                    <span className="ml-auto text-xs font-serif font-light flex-shrink-0" style={{ color: 'hsl(40 80% 50%)' }}>{p.currentStock} / {p.minStock} units</span>
+                  </div>
+                ))}
+                {(lowStockProducts.length + outOfStockProducts.length) > 6 && onNavigateToProducts && (
+                  <button
+                    onClick={onNavigateToProducts}
+                    className="text-xs font-serif tracking-wider font-light pt-1"
+                    style={{ color: 'hsl(40 30% 45%)' }}
+                  >
+                    View all {lowStockProducts.length + outOfStockProducts.length} items in Products
+                  </button>
+                )}
+              </div>
+            )}
+
+            {products.length > 0 && lowStockProducts.length === 0 && outOfStockProducts.length === 0 && (
+              <div className="flex items-center gap-2 p-3" style={{ background: 'hsl(130 40% 40% / 0.05)' }}>
+                <IoCheckmarkCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(130 40% 40%)' }} />
+                <span className="text-sm font-serif font-light tracking-wider" style={{ color: 'hsl(130 40% 40%)' }}>All products are within healthy stock levels</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-4">
