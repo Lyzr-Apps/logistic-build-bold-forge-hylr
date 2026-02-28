@@ -1,0 +1,56 @@
+{
+  "agent_name": "Shipment Tracker Agent",
+  "agent_id": "69a27d428e6d0e51fd5cd3b3",
+  "description": "Monitors active shipments for delays, route anomalies, and delivery exceptions; calculates estimated delay impact",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "delayed_shipments": [
+      {
+        "shipment_id": "string",
+        "origin": "string",
+        "destination": "string",
+        "expected_delivery": "string",
+        "estimated_delay_hours": "number",
+        "delay_reason": "string",
+        "severity": "string",
+        "recommended_action": "string"
+      }
+    ],
+    "route_anomalies": [
+      {
+        "shipment_id": "string",
+        "anomaly_type": "string",
+        "description": "string",
+        "severity": "string"
+      }
+    ],
+    "summary": "string",
+    "total_alerts": "number"
+  },
+  "example_response": {
+    "delayed_shipments": [
+      {
+        "shipment_id": "SHP-2026-00451",
+        "origin": "Grasse, France",
+        "destination": "New York, USA",
+        "expected_delivery": "2026-03-01",
+        "estimated_delay_hours": 72,
+        "delay_reason": "Customs hold on alcohol-based fragrance products",
+        "severity": "Critical",
+        "recommended_action": "Contact customs broker to expedite clearance; prepare alternative stock allocation"
+      }
+    ],
+    "route_anomalies": [
+      {
+        "shipment_id": "SHP-2026-00453",
+        "anomaly_type": "Temperature deviation",
+        "description": "Container temperature exceeded 30C for 4 hours during transit",
+        "severity": "Warning"
+      }
+    ],
+    "summary": "1 critical delay and 1 route anomaly detected across active shipments",
+    "total_alerts": 2
+  }
+}

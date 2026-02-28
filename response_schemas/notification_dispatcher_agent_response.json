@@ -1,0 +1,42 @@
+{
+  "agent_name": "Notification Dispatcher Agent",
+  "agent_id": "69a27d78a96eb35aa78a9c82",
+  "description": "Sends approved critical alerts to designated Slack channels and email recipients with formatted alert summaries",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "dispatched_alerts": [
+      {
+        "alert_id": "string",
+        "alert_title": "string",
+        "channels_sent": [
+          "string"
+        ],
+        "status": "string",
+        "timestamp": "string"
+      }
+    ],
+    "total_dispatched": "number",
+    "slack_status": "string",
+    "email_status": "string",
+    "summary": "string"
+  },
+  "example_response": {
+    "dispatched_alerts": [
+      {
+        "alert_id": "sample string",
+        "alert_title": "sample string",
+        "channels_sent": [
+          "sample string"
+        ],
+        "status": "sample string",
+        "timestamp": "sample string"
+      }
+    ],
+    "total_dispatched": 0,
+    "slack_status": "sample string",
+    "email_status": "sample string",
+    "summary": "sample string"
+  }
+}

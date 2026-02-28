@@ -1,0 +1,52 @@
+{
+  "agent_name": "Order Status Agent",
+  "agent_id": "69a27d4299680de146f8c206",
+  "description": "Reviews pending, processing, and flagged orders; identifies bottlenecks, cancellation risks, and fulfillment issues",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "flagged_orders": [
+      {
+        "order_id": "string",
+        "status": "string",
+        "issue_type": "string",
+        "age_days": "number",
+        "severity": "string",
+        "recommended_action": "string"
+      }
+    ],
+    "bottlenecks": [
+      {
+        "stage": "string",
+        "orders_affected": "number",
+        "description": "string",
+        "severity": "string"
+      }
+    ],
+    "summary": "string",
+    "total_alerts": "number"
+  },
+  "example_response": {
+    "flagged_orders": [
+      {
+        "order_id": "ORD-2026-78432",
+        "status": "Processing",
+        "issue_type": "Gift packaging backlog",
+        "age_days": 6,
+        "severity": "Critical",
+        "recommended_action": "Escalate to fulfillment team lead; offer customer expedited shipping"
+      }
+    ],
+    "bottlenecks": [
+      {
+        "stage": "Gift Wrapping",
+        "orders_affected": 23,
+        "description": "Luxury gift box supply shortage causing 3-day delay in gift orders",
+        "severity": "Warning"
+      }
+    ],
+    "summary": "1 critical order flagged and 1 bottleneck identified in fulfillment pipeline",
+    "total_alerts": 2
+  }
+}

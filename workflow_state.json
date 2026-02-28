@@ -1,0 +1,45 @@
+{
+  "agents": {
+    "inventory_monitor_agent": {
+      "agent_id": "69a27d428e6d0e51fd5cd3b1",
+      "name": "Inventory Monitor Agent",
+      "type": "sub-agent",
+      "provider": "perplexity",
+      "model": "sonar-pro"
+    },
+    "shipment_tracker_agent": {
+      "agent_id": "69a27d428e6d0e51fd5cd3b3",
+      "name": "Shipment Tracker Agent",
+      "type": "sub-agent",
+      "provider": "perplexity",
+      "model": "sonar-pro"
+    },
+    "order_status_agent": {
+      "agent_id": "69a27d4299680de146f8c206",
+      "name": "Order Status Agent",
+      "type": "sub-agent",
+      "provider": "perplexity",
+      "model": "sonar-pro"
+    },
+    "logistics_monitor_manager": {
+      "agent_id": "69a27d578e6d0e51fd5cd3b6",
+      "name": "Logistics Monitor Manager",
+      "type": "manager",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "managed_agents": [
+        "69a27d428e6d0e51fd5cd3b1",
+        "69a27d428e6d0e51fd5cd3b3",
+        "69a27d4299680de146f8c206"
+      ]
+    },
+    "notification_dispatcher_agent": {
+      "agent_id": "69a27d78a96eb35aa78a9c82",
+      "name": "Notification Dispatcher Agent",
+      "type": "independent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "tools": ["SLACK_CHAT_POST_MESSAGE", "SLACK_LIST_ALL_CHANNELS", "GMAIL_SEND_EMAIL"]
+    }
+  }
+}

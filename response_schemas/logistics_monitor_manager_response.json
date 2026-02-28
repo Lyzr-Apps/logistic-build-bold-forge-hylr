@@ -1,0 +1,94 @@
+{
+  "agent_name": "Logistics Monitor Manager",
+  "agent_id": "69a27d578e6d0e51fd5cd3b6",
+  "description": "Coordinates sub-agents to analyze inventory, shipments, and orders simultaneously; aggregates findings into a unified alert report with severity levels",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "inventory_alerts": [
+      {
+        "id": "string",
+        "title": "string",
+        "category": "string",
+        "severity": "string",
+        "description": "string",
+        "affected_items": "string",
+        "recommended_action": "string",
+        "timestamp": "string"
+      }
+    ],
+    "shipping_alerts": [
+      {
+        "id": "string",
+        "title": "string",
+        "category": "string",
+        "severity": "string",
+        "description": "string",
+        "affected_items": "string",
+        "recommended_action": "string",
+        "timestamp": "string"
+      }
+    ],
+    "order_alerts": [
+      {
+        "id": "string",
+        "title": "string",
+        "category": "string",
+        "severity": "string",
+        "description": "string",
+        "affected_items": "string",
+        "recommended_action": "string",
+        "timestamp": "string"
+      }
+    ],
+    "overall_summary": "string",
+    "total_critical": "number",
+    "total_warning": "number",
+    "total_info": "number",
+    "check_timestamp": "string"
+  },
+  "example_response": {
+    "inventory_alerts": [
+      {
+        "id": "sample string",
+        "title": "sample string",
+        "category": "sample string",
+        "severity": "sample string",
+        "description": "sample string",
+        "affected_items": "sample string",
+        "recommended_action": "sample string",
+        "timestamp": "sample string"
+      }
+    ],
+    "shipping_alerts": [
+      {
+        "id": "sample string",
+        "title": "sample string",
+        "category": "sample string",
+        "severity": "sample string",
+        "description": "sample string",
+        "affected_items": "sample string",
+        "recommended_action": "sample string",
+        "timestamp": "sample string"
+      }
+    ],
+    "order_alerts": [
+      {
+        "id": "sample string",
+        "title": "sample string",
+        "category": "sample string",
+        "severity": "sample string",
+        "description": "sample string",
+        "affected_items": "sample string",
+        "recommended_action": "sample string",
+        "timestamp": "sample string"
+      }
+    ],
+    "overall_summary": "sample string",
+    "total_critical": 0,
+    "total_warning": 0,
+    "total_info": 0,
+    "check_timestamp": "sample string"
+  }
+}

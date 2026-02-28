@@ -1,0 +1,56 @@
+{
+  "agent_name": "Inventory Monitor Agent",
+  "agent_id": "69a27d428e6d0e51fd5cd3b1",
+  "description": "Analyzes current stock levels against configured thresholds; flags low stock, overstock, and reorder-point breaches for perfume SKUs",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "low_stock_items": [
+      {
+        "sku_id": "string",
+        "product_name": "string",
+        "current_stock": "number",
+        "threshold": "number",
+        "severity": "string",
+        "recommended_action": "string"
+      }
+    ],
+    "overstock_items": [
+      {
+        "sku_id": "string",
+        "product_name": "string",
+        "current_stock": "number",
+        "max_threshold": "number",
+        "severity": "string",
+        "recommended_action": "string"
+      }
+    ],
+    "summary": "string",
+    "total_alerts": "number"
+  },
+  "example_response": {
+    "low_stock_items": [
+      {
+        "sku_id": "PERF-EDT-50-001",
+        "product_name": "Rose Noir EDT 50ml",
+        "current_stock": 12,
+        "threshold": 50,
+        "severity": "Critical",
+        "recommended_action": "Immediately reorder 200 units from supplier"
+      }
+    ],
+    "overstock_items": [
+      {
+        "sku_id": "PERF-EDP-100-015",
+        "product_name": "Ocean Breeze EDP 100ml",
+        "current_stock": 850,
+        "max_threshold": 500,
+        "severity": "Warning",
+        "recommended_action": "Consider promotional pricing to reduce excess inventory"
+      }
+    ],
+    "summary": "2 low stock alerts and 1 overstock alert detected across perfume SKUs",
+    "total_alerts": 3
+  }
+}
